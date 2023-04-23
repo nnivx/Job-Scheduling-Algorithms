@@ -1,0 +1,165 @@
+Please Ignore the algorithms. I made them for experimenting only.
+
+Input (jobs[]) -> Process (Algo) -> Output (GanttChart and AlgoResult)
+
+We have two parts of output: First is the data-only and the gui.
+You don't actually have to concern yourself from how the GUI works.
+
+These processes are independent from each other:
+
+    Algorithm
+    Utility Classes (Job, AlgorithmResult, GanttChartNode)
+    GUI Components
+    
+Only the Gui components are tightly knit (I have no time for interfacing)
+but interfaces act between gui and algorithm. What does that mean? I may
+repeat myself but, "You TOTALLY don't have to concern yourself for the GUI"
+
+If are the algo-designer, just fullfill your part and implement the interface.
+Be sure that you append data to the gantt chart or nothing will be displayed.
+How does that work?
+
+--------------------------------------------------------------------------------
+user ---inputs data to--> InputBar
+
+control buttons ---takes control over--> InputBar and Job Table
+
+add button ---gets data from--> InputBar ---passes to--> JobTable ---technically-->
+    JobTable.addJob((JobInputBar.getJobs());
+    
+more buttons ---you have the general idea that it--> controls components
+
+GanttChartFactory ---returns GanttChartGUI-->which implements--> GanttChart
+--------------------------------------------------------------------------------
+
+
+When the execute algorithm is clicked, the corresponding algorithm will be run
+--------------------------------------------------------------------------------
+    AlgorithmResult result = <algorithm>.processJobs(<job_table>.getJobs());
+    GanttChart gc = <algorithm>.makeGanttChart();
+    gc.showOutput(); // show textual output to terminal
+    if ( gc is a gui component )
+        new Simple.ComponentFrame(<algorithm>.getName(), (gui)gc); // make gui
+    display(result); // display result, like total turn around, etc.
+--------------------------------------------------------------------------------
+    
+As simple as that. AS long as you:
+    a) return AlgorithmResult
+    b) append chart data everytime
+There should be no problems. See GanttChart interface to know how to use the
+GanttChart. DefaultGanttChart is a sample class.
+
+FOR GUI DESIGNERS: There is no API for the components. There are, however,
+persistent objects: The JobInputBar, JobTable, and ControlBar. These classes
+interact with each other and should be fine even when just dumped on a frame.
+
+The gui framework is a lot more complicated than the skeleton framework.
+
+#####################################################
+Utility:
+#####################################################
+
+classes.Job
+    - Encapsulates basic job information.
+
+classes.JobInfo
+    - Utility class for storing additional job data.
+
+classes.AlgorithmResult
+    - Encapsulates algorithm results.
+
+classes.Constants
+    - Defines job fields. Reduces indexing mayhem and magic numbers
+    by naming indices.
+    
+classes.Cubes
+    - Static data, since I can't seem to open files for some reason.
+    Don't concern yourself in this.
+    
+#####################################################
+Algorithm:
+#####################################################
+
+algorithms.SchedulingAlgorithm
+    - Primary interface for scheduling algorithms. Algorithms must
+    implement this.
+    
+algorithms.AbstractSchedulingAlgorithm
+    - Abstract class that provides basic implementation for the
+    SchedulingAlgorithm interface. I kinda don't like how it's done.
+    
+algorithms.preemptive
+algorithms.nonpreemptive
+    - All the classes in these packages are for testing only. I just
+    played with them, so please replace it with the proper ones.
+    
+#####################################################
+Gantt Chart:
+#####################################################
+
+classes.GanttChart
+    - Primary interface for gantt charts.
+
+classes.DefaultGanttChart
+    - A class I sued for testing, useful for understanding how
+    GanttChart works. Not used anywhere.
+
+classes.GanttChartNode
+    - A utility class for Gantt Chart Nodes. "nodes" are the
+    individial entries in a Gantt Chart. And a complete Gantt
+    chart is a control unit over a collection of "nodes".
+    
+classes.GanttChartFactory
+    - In order to minimize editing, this utility class returns
+    an instance of what GanttChart implementing class should be
+    created. Returns GanttChartGUI, and may be changed WITHOUT
+    breaking anything.
+    
+#####################################################
+GUI:
+#####################################################
+
+gui.JobInputBar [package protected]
+    - A set of input fields for well.. input. Compact and concise.
+    Has a set of methods which eases of usage.
+
+gui.JobTable [package protected]
+    - The table. Not editable, but selectable. Also scrollable. It
+    is in reality a scrollpane though.
+
+gui.ControlBar [package protected]
+    - The control bar. Provides user control over JobInputBar and
+    JobTable. Can also display message.
+    
+gui.InvalidJobEntryException
+    - Thrown by JobInputBar when the input are wrapped to a Job
+    object, but one or more field(s) have invalid format. Usually
+    contains a message that can be displayed on ControlBar.
+    
+gui.GanttChartGUI
+    - An ongoing project, but is already usable. Allows the gantt
+    chart to be displayed as a real chart.
+    
+gui.JobSchedulingAlgorithm
+    - The main frame. You have the idea on what it is. With built-in
+    menu bar, too.
+    
+gui.Simple
+    - Contains classes for quick creation of a dialog and frame.
+
+gui.Simple.TextDialog
+    - A simple dialog box to display text. Auto-resizes to content.
+    
+gui.Simple.Frame
+    - A simple frame to display a component. Auto-resizes to content.
+    
+gui.MainWindow
+    - The class I use for designing. Do not concern yourself on this.
+
+#####################################################
+TODO:
+#####################################################
+
+gui.AlgorithmEvaluator [package protected] (Algorithms->Execute...)
+    - Execute an agorithm, display and compare results.
+    
